@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import DraftForm from '@/components/DraftForm'
-import DraftList from '@/components/DraftList'
+import DraftForm from '../components/DraftForm'
+import DraftList from '../components/DraftList'
 
 export default function DraftsPage() {
   const [drafts, setDrafts] = useState([])
