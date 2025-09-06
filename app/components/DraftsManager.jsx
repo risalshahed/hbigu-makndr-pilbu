@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react';
+import DraftForm from './DraftForm';
+import DraftList from './DraftList';
 
 function slugify(text) {
   return text
@@ -8,7 +10,8 @@ function slugify(text) {
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+    .replace(/^-+|-+$/g, '')
+    .replace(/^-+|-+$/g, '') || 'draft'; // Fallback to 'draft' if empty
 }
 
 export default function DraftsManager() {
@@ -17,20 +20,26 @@ export default function DraftsManager() {
   const [drafts, setDrafts] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
-  
+  // Added state for publish results feedback
+  const [publishResults, setPublishResults] = useState(null);
+
   // load drafts from localStorage
   useEffect(() => {
     try {
       const raw = localStorage.getItem('drafts');
-      if (raw) setDrafts(JSON.parse(raw));
+      if (raw) {
+        console.log('Loading drafts from localStorage:', JSON.parse(raw));
+        setDrafts(JSON.parse(raw));
+      }
     } catch (e) {
-      console.error('Failed to load drafts', e);
+      console.error('Failed to load drafts:', e);
     }
   }, []);
 
   // persist drafts
   useEffect(() => {
     try {
+      console.log('Saving drafts to localStorage:', drafts);
       localStorage.setItem('drafts', JSON.stringify(drafts));
     } catch (e) {
       console.error('Failed to save drafts', e);
@@ -42,30 +51,41 @@ export default function DraftsManager() {
     setTitle('');
     setBody('');
     setEditingId(null);
-  } 
+  }
   
   function handleAdd() {
+    // Added validation for title and body
     if (!title.trim()) return alert('Please add a title');
+    if (!body.trim()) return alert('Please add a body');
+
     const newDraft = {
       id: Date.now().toString(),
       title: title.trim(),
-      body: body,
-      slug: slugify(title),
+      body: body.trim(),
+      // slug: slugify(title),
+      // Modified to append timestamp to slug for uniqueness
+      slug: `${slugify(title)}-${Date.now()}`,
       createdAt: new Date().toISOString(),
     };
+
     if (editingId) {
+      console.log('Updating draft:', newDraft);
       setDrafts(prev => prev.map(
         d => (
           d.id === editingId
           ?
           {
-            ...d, title: newDraft.title, body: newDraft.body, slug: newDraft.slug
+            ...d,
+            title: newDraft.title,
+            body: newDraft.body,
+            slug: newDraft.slug
           }
           :
           d
         )
       ));
     } else {
+      console.log('Adding new draft:', newDraft);
       setDrafts(prev => [
         newDraft, ...prev
       ]);
@@ -76,6 +96,7 @@ export default function DraftsManager() {
   function handleEdit(id) {
     const d = drafts.find(x => x.id === id);
     if (!d) return;
+    console.log('Editing draft:', d);
     setTitle(d.title);
     setBody(d.body);
     setEditingId(id);
@@ -84,113 +105,119 @@ export default function DraftsManager() {
     
   function handleDelete(id) {
     if (!confirm('Delete this draft?')) return;
-    setDrafts(prev => prev.filter((d) => d.id !== id));
+    console.log('Deleting draft with id:', id);
+    setDrafts(prev => prev.filter(d => d.id !== id));
   }
-    
-    
+
   // Publish all drafts to GitHub
-  async function handlePublishAll() {
-    if (drafts.length === 0) return alert('No drafts to publish');
-    setLoading(true);
-    try {
-      const res = await fetch('/api/publish', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ drafts }),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json?.message || 'Publish failed');
-      alert('Published ' + (json.results?.length || 0) + ' files. Check repository.');
-      setDrafts([]); // clear drafts after success
-      localStorage.removeItem('drafts');
-    } catch (err) {
-      console.error(err);
-      alert('Publish failed: ' + err.message);
-    } finally {
-      setLoading(false);
+async function handlePublishAll() {
+  if (drafts.length === 0) return alert('No drafts to publish');
+
+  // Validation
+  const invalidDraft = drafts.find(d => !d.title.trim() || !d.body.trim());
+  if (invalidDraft) return alert('All drafts must have a title and body');
+
+  setLoading(true);
+  setPublishResults(null);
+
+  try {
+    console.log('Publishing drafts:', drafts);
+    const res = await fetch('/api/publish', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ drafts }),
+    });
+
+    const json = await res.json();
+    console.log('Publish API response:', json);
+
+    // Instead of killing on !res.ok, always show results
+    if (!res.ok) {
+      // Rate limit explicit error
+      if (res.status === 403 && json.message?.includes('rate limit')) {
+        alert('GitHub API rate limit exceeded. Please try again later.');
+      } else {
+        alert('Some errors occurred while publishing drafts.');
+      }
     }
+
+    // ✅ Always set results, even if partial failure
+    setPublishResults(json.results);
+
+    // Show summary
+    const successCount = json.results?.filter(r => r.success).length || 0;
+    const failCount = json.results?.filter(r => !r.success).length || 0;
+
+    alert(`Publish finished: ${successCount} success, ${failCount} failed.`);
+
+    console.log('Publish results:', json.results);
+
+    // Clear drafts only if all were successful
+    if (failCount === 0) {
+      setDrafts([]);
+      localStorage.removeItem('drafts');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Publish failed: ' + err.message);
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <section className="mt-6">
       <h2 className="text-lg font-semibold">
         Write a draft
-      </h2>
-      <div className="mt-3 grid gap-2">
-        <input
-          aria-label="Title"
-          className="border rounded px-3 py-2"
-          placeholder="Title"
-          value={title}
-          onChange={(e)=> setTitle(e.target.value)}
-        />
-        <textarea
-          aria-label="Body"
-          className="border rounded px-3 py-2 h-36"
-          placeholder="Markdown body"
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-        />
-        <div className="flex gap-2">
-          <button
-            className="bg-blue-600 text-white px-4 py-2 rounded"
-            onClick={handleAdd}
-          >
-            {editingId ? 'Save' : 'Add Draft'}
-          </button>
-          <button className="bg-gray-200 px-4 py-2 rounded" onClick={resetForm}>
-            Clear
-          </button>
-        </div>
-      </div>
+      </h2>      
+      {/* Modified: Use DraftForm and pass editing draft */}
+      <DraftForm
+        onAdd={handleAdd}
+        title={title}
+        setTitle={setTitle}
+        body={body}
+        setBody={setBody}
+        initialValues={editingId ? drafts.find(d => d.id === editingId) : null}
+      />
       
-      {/* Draft list */}
+      {/* Use DraftList */}
       <div className="mt-6">
-        <h3 className="font-semibold">Drafts ({drafts.length})</h3>
-        <div className="mt-3 space-y-3">
-          {
-            drafts.length === 0 && <div className="text-sm text-gray-500">No drafts yet.</div>
-          }
-          {
-            drafts.map(d =>
-              <div key={d.id} className="border rounded p-3 flex justify-between items-start">
-                <div className="max-w-[70%]">
-                  <div className="font-medium">{d.title}</div>
-                  <div className="text-xs text-gray-600 truncate">{d.slug} • {new Date(d.createdAt).toLocaleString()}</div>
-                  <div className="mt-2 text-sm text-gray-800 line-clamp-3 whitespace-pre-wrap">{d.body}</div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <button
-                    className="text-sm text-blue-600"
-                    onClick={() => handleEdit(d.id)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="text-sm text-red-600"
-                    onClick={() => handleDelete(d.id)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            )
-          }
-        </div>
-        
-        {/* Publish All button */}
-        <div className="mt-4">
-          <button
-            disabled={loading}
-            className={`px-4 py-2 rounded text-white ${
-              loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
-            }`}
-            onClick={handlePublishAll}
-          >
-            {loading ? 'Publishing...' : 'Publish All'}
-          </button>
-        </div>
+        <h3 className="font-semibold">Drafts ({drafts.length})</h3>        
+        <DraftList
+          drafts={drafts} 
+          onAdd={handleAdd} // Reuse handleAdd for updates
+          onDelete={handleDelete}
+          onEdit={handleEdit}
+        />
       </div>
+
+        
+      {/* Publish All button */}
+      <div className="mt-4">
+        <button
+          disabled={loading}
+          className={`px-4 py-2 rounded text-white ${
+            loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
+          }`}
+          onClick={handlePublishAll}
+        >
+          {loading ? 'Publishing...' : 'Publish All'}
+        </button>
+      </div>
+
+      {/* Added: Publish results feedback */}
+      {publishResults && (
+        <div className="mt-4 p-3 border rounded">
+          <h3 className="font-semibold">Publish Results</h3>
+          <ul className="mt-2 space-y-2">
+            {publishResults.map((result, i) =>
+              <li key={i} className={result.success ? 'text-green-600' : 'text-red-600'}>
+                {result.file}: {result.success ? 'Published successfully' : `Failed - ${result.error}`}
+              </li>
+            )}
+          </ul>
+        </div>
+      )}
     </section>
   );
 }
