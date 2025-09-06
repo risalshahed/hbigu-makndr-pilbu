@@ -123,7 +123,7 @@ export async function commitMarkdownFiles(files) {
     }
   }, Promise.resolve([]));
 
-  console.log('results', results);
+  // console.log('results', results);
 
   return results;
 }
