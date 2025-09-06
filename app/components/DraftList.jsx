@@ -34,7 +34,7 @@ export default function DraftList({ drafts, onAdd, onDelete, onEdit }) {
               <button
                 onClick={() => {
                   console.log('Deleting draft with id:', draft.id);
-                  onDelete(i);
+                  onDelete(draft.id);
                 }}
                 className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
               >

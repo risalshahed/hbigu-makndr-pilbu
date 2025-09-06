@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+* {
+  box-sizing: border-box;
+}
+.boxShadow {
+  grid-template-rows: masonry;
+}
+
+.boxShadow > div {
+  box-shadow: 5px 8px 18px #aaa;
+  padding: 12px 18px;
+  border-radius: 8px;
+}
