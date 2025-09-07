@@ -10,7 +10,7 @@ A modern **Next.js** app that allows authors to **Publish, Read, Update & Delete
 
 ## GitHub Repository
 
-[Code Repository](https://github.com/risalshahed/hbigu-makndr-pilbu.git)
+[Content Repository](https://github.com/risalshahed/hbigu-makndr-pilbu/tree/main/content)
 
 ---
 
