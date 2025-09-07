@@ -39,7 +39,7 @@ export default function DraftsManager() {
         <h3 className="font-semibold">Drafts ({drafts.length})</h3>        
         <DraftList
           drafts={drafts} 
-          onAdd={handleAdd} // Reuse handleAdd for updates
+          onAdd={handleAdd}
           onDelete={handleDelete}
           onEdit={handleEdit}
         />

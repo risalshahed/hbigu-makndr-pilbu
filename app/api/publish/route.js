@@ -1,4 +1,3 @@
-// /api/publish/route.js
 import { commitMarkdownFiles } from '@/app/lib/github';
 import { NextResponse } from 'next/server';
 
@@ -47,8 +46,8 @@ export async function POST(req) {
 
     return NextResponse.json({
       success: true,
-      results, // all results with success/fail per file
-      errors,  // all failed file errors
+      results,
+      errors
     });
   } catch (err) {
     return NextResponse.json(

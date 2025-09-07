@@ -4,8 +4,6 @@ import PublishGrid from './PublishGrid';
 export default async function PublishList() {
   const contents = await fetchMarkdownFromGitHub();
 
-  // const [colCount, setColCount] = useState(3);
-
   return (
     <>
       <h1 className="text-2xl sm:text-4xl font-extrabold py-4 sm:py-12 text-center">

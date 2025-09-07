@@ -10,7 +10,6 @@ export default function DraftsProvider({ children }) {
   const [drafts, setDrafts] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
-  // Added state for publish results feedback
   const [publishResults, setPublishResults] = useState(null);
   const [colCount, setColCount] = useState(3);
 
@@ -53,18 +52,16 @@ export default function DraftsProvider({ children }) {
       const res = await fetch(url, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
-      return res.ok; // true if file exists
+      return res.ok;
     } catch (err) {
-      return false; // fail safe
+      return false;
     }
   }
 
   async function handleAdd() {
-    // Added validation for title and body
     if (!title.trim()) return alert('Please add a title');
     if (!body.trim()) return alert('Please add a body');
 
-    // Check if title already exists locally
     if (drafts.some(d => d.title.trim().toLowerCase() === title.trim().toLowerCase())) {
       return alert('Draft with this title already exists locally.');
     }
@@ -80,8 +77,6 @@ export default function DraftsProvider({ children }) {
       id: Date.now().toString(),
       title: title.trim(),
       body: body.trim(),
-      // slug: slugify(title),
-      // Modified to append timestamp to slug for uniqueness
       slug: `${slugify(title)}-${Date.now()}`,
       createdAt: new Date().toISOString(),
     };
@@ -127,7 +122,6 @@ export default function DraftsProvider({ children }) {
   async function handlePublishAll() {
     if (drafts.length === 0) return alert('No drafts to publish');
 
-    // Validation
     const invalidDraft = drafts.find(d => !d.title.trim() || !d.body.trim());
     if (invalidDraft) return alert('All drafts must have a title and body');
 
@@ -143,9 +137,7 @@ export default function DraftsProvider({ children }) {
 
       const json = await res.json();
 
-      // Instead of killing on !res.ok, always show results
       if (!res.ok) {
-        // Rate limit explicit error
         if (res.status === 403 && json.message?.includes('rate limit')) {
           alert('GitHub API rate limit exceeded. Please try again later.');
         } else {
@@ -153,16 +145,13 @@ export default function DraftsProvider({ children }) {
         }
       }
 
-      // Always set results, even if partial failure
       setPublishResults(json.results);
 
-      // Show summary
       const successCount = json.results?.filter(r => r.success).length || 0;
       const failCount = json.results?.filter(r => !r.success).length || 0;
 
       alert(`Publish finished: ${successCount} success, ${failCount} failed.`);
 
-      // Clear drafts only if all were successful
       if (failCount === 0) {
         setDrafts([]);
         localStorage.removeItem('drafts');

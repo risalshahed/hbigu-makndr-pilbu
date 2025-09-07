@@ -5,5 +5,5 @@ export const slugify = text => {
     .trim()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
-    .replace(/^-+|-+$/g, '') || 'draft'; // Fallback to 'draft' if empty
+    .replace(/^-+|-+$/g, '') || 'draft';
 }

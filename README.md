@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Markdown Authoring & Publishing Platform
 
-## Getting Started
+A modern **Next.js** app that allows authors to **create, edit, delete, and publish Markdown files** directly to GitHub. Drafts are persisted locally, and published files are committed to a GitHub repository safely using environment variables. The app also fetches and renders Markdown files from GitHub as sanitized HTML.
 
-First, run the development server:
+---
+
+## 🚀 Live Demo
+
+[Live Site URL](YOUR_LIVE_URL_HERE)
+
+## 📂 GitHub Repository
+
+[Repository Link](YOUR_GITHUB_REPO_URL_HERE)
+
+---
+
+## ⚙️ Technology Stack
+
+- **Framework:** Next.js 15.5.2
+- **Styling:** Tailwind CSS
+- **Version Control:** Git + GitHub
+- **Dependencies beyond Next.js & Tailwind:**
+  - `react-markdown` – To render Markdown content as React components.
+  - `rehype-raw` – To allow HTML inside Markdown files.
+  - `rehype-sanitize` – To sanitize HTML and prevent XSS attacks.
+  - `remark-gfm` – To support GitHub Flavored Markdown syntax (tables, strikethroughs, task lists).
+  - `simple-git` – For handling Git operations locally if needed (committing/pushing programmatically).
+
+> These dependencies are carefully chosen to safely handle Markdown content while providing a modern, interactive authoring experience.
+
+---
+
+## 📝 Features
+
+### Draft Management
+
+- Create, edit, and delete drafts.
+- Drafts are persisted in `localStorage` across reloads.
+- Each draft has a unique slug (timestamp + slugified title).
+
+### Publishing
+
+- “Publish All” feature commits multiple Markdown files to GitHub in parallel.
+- Prevents duplicate titles both locally and on GitHub.
+- Uses environment variables for GitHub authentication; secrets are **never exposed** to the client.
+
+### Content Fetching
+
+- Fetch Markdown files from GitHub repository.
+- Render Markdown as sanitized HTML in a responsive grid layout.
+- Supports sorting by **title** and **published date**.
+- Adjustable grid columns for large screens (3, 4, or 5 columns).
+
+### UI / UX
+
+- Responsive and accessible design using Tailwind CSS.
+- Interactive UI for managing drafts and viewing published content.
+- Dropdowns for sorting and layout customization.
+
+---
+
+## 📦 Installation & Setup
+
+1. Clone the repository:
+
+```bash
+git clone YOUR_GITHUB_REPO_URL_HERE
+cd YOUR_PROJECT_FOLDER
+```
+
+### Install dependencies
+
+```bash
+npm install
+# or
+yarn
+```
+
+### Configure environment variables in .env.local
+
+```bash
+GITHUB_OWNER=your-github-username
+GITHUB_REPO=your-repo-name
+GITHUB_BRANCH=main
+GITHUB_TOKEN=your_personal_access_token
+```
+
+#### Note: Keep .env.local secret. Do not commit it. Token is only used server-side.
+
+### Run locally
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
