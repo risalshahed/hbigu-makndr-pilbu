@@ -1,20 +1,20 @@
 # Markdown Authoring & Publishing Platform
 
-A modern **Next.js** app that allows authors to **create, edit, delete, and publish Markdown files** directly to GitHub. Drafts are persisted locally, and published files are committed to a GitHub repository safely using environment variables. The app also fetches and renders Markdown files from GitHub as sanitized HTML.
+A modern **Next.js** app that allows authors to **Publish, Read, Update & Delete Markdown files** directly to GitHub. Drafts are persisted locally, and published files are committed to a GitHub repository safely using environment variables. The app also fetches and renders Markdown files from GitHub as sanitized HTML.
 
 ---
 
-## 🚀 Live Demo
+## Live Demo
 
-[Live Site URL](YOUR_LIVE_URL_HERE)
+[Live Application](https://hbigu-makndr-pilbu.vercel.app)
 
-## 📂 GitHub Repository
+## GitHub Repository
 
-[Repository Link](YOUR_GITHUB_REPO_URL_HERE)
+[Code Repository](https://github.com/risalshahed/hbigu-makndr-pilbu.git)
 
 ---
 
-## ⚙️ Technology Stack
+## Technology Stack
 
 - **Framework:** Next.js 15.5.2
 - **Styling:** Tailwind CSS
@@ -30,7 +30,7 @@ A modern **Next.js** app that allows authors to **create, edit, delete, and publ
 
 ---
 
-## 📝 Features
+## Features
 
 ### Draft Management
 
@@ -59,7 +59,7 @@ A modern **Next.js** app that allows authors to **create, edit, delete, and publ
 
 ---
 
-## 📦 Installation & Setup
+## Installation & Setup
 
 1. Clone the repository:
 
