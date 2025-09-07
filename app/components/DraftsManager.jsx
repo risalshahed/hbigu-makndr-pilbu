@@ -59,11 +59,9 @@ export default function DraftsManager() {
         </button>
       </div>
 
-      {console.log({publishResults})}
-
       {/* Added: Publish results feedback */}
       {publishResults && (
-        <div className="mt-4 p-3 border rounded">
+        <div className="boxShadow mt-4 p-3 rounded">
           <h3 className="font-semibold">Publish Results</h3>
           <ul className="mt-2 space-y-2">
             {publishResults.map((result, i) =>

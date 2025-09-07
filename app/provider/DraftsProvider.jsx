@@ -19,21 +19,17 @@ export default function DraftsProvider({ children }) {
     try {
       const raw = localStorage.getItem('drafts');
       if (raw) {
-        console.log('Loading drafts from localStorage:', JSON.parse(raw));
         setDrafts(JSON.parse(raw));
       }
     } catch (e) {
-      console.error('Failed to load drafts:', e);
     }
   }, []);
 
   // persist drafts
   useEffect(() => {
     try {
-      console.log('Saving drafts to localStorage:', drafts);
       localStorage.setItem('drafts', JSON.stringify(drafts));
     } catch (e) {
-      console.error('Failed to save drafts', e);
     }
   }, [drafts]);
   
@@ -59,7 +55,6 @@ export default function DraftsProvider({ children }) {
       });
       return res.ok; // true if file exists
     } catch (err) {
-      console.error('GitHub check failed:', err);
       return false; // fail safe
     }
   }
@@ -92,7 +87,6 @@ export default function DraftsProvider({ children }) {
     };
 
     if (editingId) {
-      console.log('Updating draft:', newDraft);
       setDrafts(prev => prev.map(
         d => (
           d.id === editingId
@@ -108,7 +102,6 @@ export default function DraftsProvider({ children }) {
         )
       ));
     } else {
-      console.log('Adding new draft:', newDraft);
       setDrafts(prev => [
         newDraft, ...prev
       ]);
@@ -119,7 +112,6 @@ export default function DraftsProvider({ children }) {
   function handleEdit(id) {
     const d = drafts.find(x => x.id === id);
     if (!d) return;
-    console.log('Editing draft:', d);
     setTitle(d.title);
     setBody(d.body);
     setEditingId(id);
@@ -128,7 +120,6 @@ export default function DraftsProvider({ children }) {
     
   function handleDelete(id) {
     if (!confirm('Delete this draft?')) return;
-    console.log('Deleting draft with id:', id);
     setDrafts(prev => prev.filter(d => d.id !== id));
   }
 
@@ -144,7 +135,6 @@ export default function DraftsProvider({ children }) {
     setPublishResults(null);
 
     try {
-      console.log('Publishing drafts:', drafts);
       const res = await fetch('/api/publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -152,7 +142,6 @@ export default function DraftsProvider({ children }) {
       });
 
       const json = await res.json();
-      console.log('Publish API response:', json);
 
       // Instead of killing on !res.ok, always show results
       if (!res.ok) {
@@ -173,15 +162,12 @@ export default function DraftsProvider({ children }) {
 
       alert(`Publish finished: ${successCount} success, ${failCount} failed.`);
 
-      console.log('Publish results:', json.results);
-
       // Clear drafts only if all were successful
       if (failCount === 0) {
         setDrafts([]);
         localStorage.removeItem('drafts');
       }
     } catch (err) {
-      console.error(err);
       alert('Publish failed: ' + err.message);
     } finally {
       setLoading(false);

@@ -26,7 +26,9 @@ export default function RootLayout({ children }) {
       >
         <DraftsProvider>
           <Header />
-          {children}
+          <main className='py-4 sm:py-8'>
+            {children}
+          </main>
         </DraftsProvider>
       </body>
     </html>

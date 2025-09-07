@@ -7,7 +7,6 @@ export default function DraftForm({ onAdd, initialValues, title, setTitle, body,
   // Populate form with initial values for editing
   useEffect(() => {
     if (initialValues) {
-      console.log('Populating form with initial values:', initialValues);
       setTitle(initialValues.title || '');
       setBody(initialValues.body || '');
     } else {
@@ -18,19 +17,14 @@ export default function DraftForm({ onAdd, initialValues, title, setTitle, body,
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Trim values before validation
     const trimmedTitle = title.trim();
     const trimmedBody = body.trim();
-    // if (!title || !body) return alert('Please add a title and body');
     if (!trimmedTitle) {
-      console.log('Validation failed: Title is empty');
       return alert('Please add a title');
     }
     if (!trimmedBody) {
-      console.log('Validation failed: Body is empty');
       return alert('Please add a body');
     }
-    console.log('Submitting draft:', { title: trimmedTitle, body: trimmedBody });
     onAdd({
       title: trimmedTitle,
       body: trimmedBody

@@ -4,7 +4,7 @@ import remarkGfm from 'remark-gfm'
 
 export default function MarkdownRenderer({ content }) {
   return (
-    <div className="prose max-w-none">
+    <div>
       <ReactMarkdown
         remarkPlugins={[ remarkGfm ]}
         rehypePlugins={[ rehypeSanitize ]}
