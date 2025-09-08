@@ -110,6 +110,8 @@ export default function DraftsProvider({ children }) {
     setTitle(d.title);
     setBody(d.body);
     setEditingId(id);
+    // scroll to top
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
     
     
