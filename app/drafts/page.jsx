@@ -12,7 +12,7 @@ export default function DraftsPage() {
         </h1>
         <Link href='/'>
           <button className='bg-green-700 hover:bg-green-600 text-white px-3 py-1 rounded'>
-            Draft List
+            Publish List
           </button>
         </Link>
       </div>
